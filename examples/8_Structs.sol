@@ -12,5 +12,5 @@ main()
   ; Accessing properties:
   _out -> Guy.name
   ; Changing properties:
-  Player.name -> "Bob"
+  Guy.name -> "Bob"
 end
