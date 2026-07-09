@@ -3,12 +3,18 @@ afor(f, out)
     _out -> out
   end
 end
-; afor(1, "Hello") >> _async()
+; Loop.afor(1, "Hello") >> _async()
 
 awhile(arg, out)
   while arg == arg
     _out -> out
   end
 end
-; awhile(1, "Hello") >> _async()
+; Loop.awhile(1, "Hello") >> _async()
 ; Keep in mind that asynchronous functions cannot return values with _return.
+
+awhen(a, b, out)
+  _get("std/extcond/Cond.sol")
+  _out -> Cond.while(1, 2, out)
+; Loop.awhen(1,1,"Hello")
+end
