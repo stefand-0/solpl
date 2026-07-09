@@ -71,6 +71,7 @@ end
 
 > [!IMPORTANT]
 > Asynchronous functions cannot use the _return method to return a value. Please use _out instead.
+
 > [!TIP]
 > Make use of the standard libraries for extra data types, such as Booleans, HashMaps etc.
 # License
