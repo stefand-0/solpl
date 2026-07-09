@@ -42,14 +42,20 @@ wrap(text, open_tags, close_tags)
     _return -> open_tags + text + close_tags
 end
 
-reverse(text, len)
-    reversed_str -> ""
-    limit -> len - 1
-    
-    ; Loops backwards from the end of the string to 0
-    for i -> limit to 0
-        reversed_str -> reversed_str + text[i]
+indent(text, spaces_count)
+    spaces -> ""
+    for i -> 1 to spaces_count
+        spaces -> spaces + " "
     end
-    
-    _return -> reversed_str
+    _return -> spaces + text
 end
+
+join(str1, separator, str2)
+    _return -> str1 + separator + str2
+end
+
+to_json_kv(key, value)
+    quote -> """
+    _return -> quote + key + quote + ": " + quote + value + quote
+end
+
