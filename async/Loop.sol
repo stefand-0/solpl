@@ -11,3 +11,4 @@ awhile(arg, out)
   end
 end
 ; awhile(1, "Hello") >> _async()
+; Keep in mind that asynchronous functions cannot return values with _return.
