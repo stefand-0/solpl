@@ -36,3 +36,40 @@ mod(n, d)
     _return -> n
   end
 end
+
+max(a, b)
+  if a > b
+    _return -> a
+  else
+    _return -> b
+  end
+end
+
+min(a, b)
+  if a < b
+    _return -> a
+  else
+    _return -> b
+  end
+end
+
+clamp(v, l, h)
+  if v < l
+    _return -> l 
+  elseif v > h
+    _return -> h
+  else
+    _return -> v
+  end
+end
+
+fact(n)
+  r -> 1
+  if n == 0
+    _return -> 1
+  end
+  for i -> 1 to n
+    r -> r * i
+  end
+  _return -> r
+end
