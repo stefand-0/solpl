@@ -27,3 +27,15 @@ insert(tree_list, value)
         end
     end
 end
+
+get_left_child(index)
+    _return -> (2 * index) + 1
+end
+
+get_right_child(index)
+    _return -> (2 * index) + 2
+end
+
+get_parent(index)
+    _return -> (index - 1) : 2
+end
