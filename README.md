@@ -69,6 +69,10 @@ main()
 end
 ```
 
+> [!IMPORTANT]
+> Asynchronous functions cannot use the _return method to return a value. Please use _out instead.
+> [!TIP]
+> Make use of the standard libraries for extra data types, such as Booleans, HashMaps etc.
 # License
 
 This repository is licensed with Apache License 2.0, see the LICENSE file for more details
