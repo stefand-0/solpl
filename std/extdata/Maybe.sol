@@ -4,13 +4,15 @@ Maybe{}
 end
 
 some(val)
-  Maybe.status -> 1
-  Maybe.value -> val
-  _return -> Maybe{}
+  m -> Maybe{}
+  m.status -> 1
+  m.value -> val
+  _return -> m
 end
 
 none(val)
-  Maybe.status -> 0
-  _return -> Maybe{}
+  m -> Maybe{}
+  m.status -> 0
+  _return -> m
 end
 
