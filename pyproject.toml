@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "solpl"
-version = "2.6.0"
+version = "2.6.5"
 authors = [
     { name = "stefand-0", email = "stefand-0@users.noreply.github.com" }
 ]
