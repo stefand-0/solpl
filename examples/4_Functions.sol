@@ -1,6 +1,7 @@
 ; Functions are defined with "()"
-myFunction()
-  _return -> 1
+; The _return method only works for synchronous functions.
+myFunction(input)
+  _return -> input
 end
 
 ; main() is the starting point for every program
