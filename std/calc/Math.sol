@@ -73,3 +73,34 @@ fact(n)
   end
   _return -> r
 end
+
+gcd(a, b)
+  while b > 0
+    t -> b
+    b -> mod(a, b)
+    a -> t
+  end
+  _return -> a
+end
+
+fib(n)
+  if n == 0
+        _return -> 0
+    elseif n == 1
+        _return -> 1
+    end
+    
+    a -> 0
+    b -> 1
+    for i -> 2 to n
+        next_val -> a + b
+        a -> b
+        b -> next_val
+    end
+    _return -> b
+end
+
+percent(part, total)
+    ; Multiplies first to avoid float issues, then divides
+    _return -> (part * 100) : total
+end
