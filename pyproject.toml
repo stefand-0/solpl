@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "solpl"
+version = "2.6.0"
+authors = [
+    { name = "stefand-0", email = "stefand-0@users.noreply.github.com" }
+]
+description = "A lightweight, multi-threaded interpreter for the Sol programming language"
+readme = "README.md"
+license = "Apache-2.0"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent"
+]
+
+[project.scripts]
+solpl = "interpreter.sol:main"
+
+[tool.setuptools.packages]
+find = { include = ["interpreter"] }
+            
