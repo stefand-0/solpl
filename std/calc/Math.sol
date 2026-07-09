@@ -20,7 +20,7 @@ end
 
 pow(b, e)
   res -> 1
-  for i -> 0 to exp
+  for i -> 0 to e
     res -> res * b
   end
   _return -> res
