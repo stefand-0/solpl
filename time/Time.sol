@@ -16,7 +16,7 @@ delay(seconds)
     
     ; Keep loop spinning until the network says time is up!
     while current_time < target_time
-        current_time -> fetch_live_epoch()
+        current_time -> epoch()
     end
 end
 
