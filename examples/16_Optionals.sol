@@ -2,6 +2,7 @@ find_user(id)
   id == 1 ? _return -> Maybe.some("Guy")
   _return -> Maybe.none()
 end
+; Optional structs have 2 parameters: value, status
 main()
   _get("std/extdata/Maybe.sol")
   ; For example, checking for an ID.
