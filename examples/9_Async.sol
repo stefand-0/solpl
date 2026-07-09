@@ -6,7 +6,8 @@ myAsync()
 end
 
 main()
-  _out -> "Async starting."
+  ; You can also have async output
+  "Async starting." >> _out >> _async
   ; Pipe the function into the global _async method
   myAsync() >> _async
   ; Printing the initial state:
