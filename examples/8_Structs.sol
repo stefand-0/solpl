@@ -7,8 +7,10 @@ Player{}
 end
 
 main()
+  ; Initialising a copy of Person{}
+  Guy -> Person{}
   ; Accessing properties:
-  _out -> Player.name
+  _out -> Guy.name
   ; Changing properties:
   Player.name -> "Bob"
 end
