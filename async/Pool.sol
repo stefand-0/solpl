@@ -3,7 +3,7 @@ WorkerPool{}
     active_workers -> 0
     task_count -> 0
 end
-
+; pass WorkerPool{} as pool_struct
 dispatch(pool_struct, function_name, argument)
     _get("std/extdata/Queue.sol")
     
