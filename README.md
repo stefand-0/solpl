@@ -57,7 +57,7 @@ This demonstrates Sol's capabilities with async:
 ```lua
 countDown(taskName, maxCount)
     for i -> 1 to maxCount
-        _out -> taskName
+        _return -> taskName
     end
 end
 
