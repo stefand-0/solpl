@@ -53,7 +53,28 @@ class SolInterpreter:
 
     def _compute(self, expr):
         expr = str(expr).strip()
-
+        idx = 0
+        while True:
+            end_idx = expr.find(')', idx)
+            if end_idx == -1:
+                break
+            start_idx = expr.rfind('(', 0, end_idx)
+            if start_idx == -1:
+                break
+            
+            # If there's a letter, number, or underscore right before the '(',
+            # it's a function call (like my_func() or _fetch()), so skip it here!
+            if start_idx > 0 and (expr[start_idx - 1].isalnum() or expr[start_idx - 1] == '_'):
+                idx = end_idx + 1
+                continue
+            
+            # Extract and evaluate the pure math inside the brackets
+            inner_expr = expr[start_idx + 1:end_idx]
+            inner_result = self._compute(inner_expr)
+            
+            # Stitch the evaluated number back into the main formula string
+            expr = expr[:start_idx] + str(inner_result) + expr[end_idx + 1:]
+            idx = 0 # Reset to scan the newly formed string from the beginning
         def split_outside_quotes(string, op):
             parts = []
             current = []
