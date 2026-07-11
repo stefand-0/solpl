@@ -15,7 +15,7 @@ append(list, current_node_count, value)
     _add(list, next_ptr_idx, -1)
     
     ; If the list was completely empty, make Head point to this new node
-    if list[0] == -1
+    if list[0] = -1
         list[0] -> new_node_idx
     else
         ; Otherwise, walk the pointers to find the current tail node
