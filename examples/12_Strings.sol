@@ -9,7 +9,7 @@ main()
   list<ls>
   _add(ls, 1, "A")
   _add(ls, 2, "B")
-  hasChar -> String.contains_char("A")
+  hasChar -> String.contains_char(ls, 2, "A")
   hasChar = 1 ? _out -> "Has A!"
 
   ; There are many more methods in String.sol
