@@ -7,6 +7,6 @@ main()
   _get("std/extdata/Maybe.sol")
   ; For example, checking for an ID.
   result -> find_user(1)
-  result.status == 0 ? _out -> "User not found!"
-  result.status == 1 ? _out -> "User found: " + result.value 
+  result.status = 0 ? _out -> "User not found!"
+  result.status = 1 ? _out -> "User found: " + result.value 
 end
