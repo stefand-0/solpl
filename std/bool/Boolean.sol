@@ -9,7 +9,7 @@ false()
 end
 
 not(n)
-  if n == 1
+  if n = 1
     _return -> 0
   else
     _return -> 1
@@ -17,8 +17,8 @@ not(n)
 end
 
 and(a, b)
-  if a == 1
-    if b == 1
+  if a = 1
+    if b = 1
       _return -> 1
     end
   end
@@ -26,9 +26,9 @@ and(a, b)
 end
 
 or(a, b)
-  if a == 1
+  if a = 1
     _return -> 1
-  elseif b == 1
+  elseif b = 1
     _return -> 1
   else
     _return -> 0
@@ -36,7 +36,7 @@ or(a, b)
 end
 
 xor(a, b)
-    if a == b
+    if a = b
         _return -> 0
     else
         _return -> 1
@@ -44,8 +44,8 @@ xor(a, b)
 end
 
 nand(a, b)
-    if a == 1
-        if b == 1
+    if a = 1
+        if b = 1
             _return -> 0
         end
     end
@@ -53,9 +53,9 @@ nand(a, b)
 end
 
 nor(a, b)
-    if a == 1
+    if a = 1
         _return -> 0
-    elseif b == 1
+    elseif b = 1
         _return -> 0
     else
         _return -> 1
@@ -63,8 +63,8 @@ nor(a, b)
 end
 
 implies(a, b)
-    if a == 1
-        if b == 0
+    if a = 1
+        if b = 0
             _return -> 0
         end
     end
@@ -72,7 +72,7 @@ implies(a, b)
 end
 
 to_str(val)
-    if val == 1
+    if val = 1
         _return -> "true"
     else
         _return -> "false"
