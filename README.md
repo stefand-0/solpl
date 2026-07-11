@@ -51,6 +51,10 @@ pip install solpl
 solpl FILENAME.sol
 ```
 
+# Libraries:
+
+Please clone: https://github.com/stefand-0/solstd into your home directory
+
 # Example:
 
 This demonstrates Sol's capabilities with async:
