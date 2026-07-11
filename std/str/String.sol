@@ -1,5 +1,5 @@
 empty(text)
-    if text == ""
+    if text = ""
         _return -> 1 ; True
     else
         _return -> 0 ; False
@@ -9,7 +9,7 @@ end
 contains_char(text, len, char)
     limit -> len - 1
     for i -> 0 to limit
-        if text[i] == char
+        if text[i] = char
             _return -> 1 ; True! Found it!
         end
     end
