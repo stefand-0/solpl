@@ -1,7 +1,7 @@
 find(list, size, element)
     limit -> size - 1
     for i -> 0 to limit
-        if list[i] == element
+        if list[i] = element
             _return -> i
         end
     end
@@ -10,7 +10,7 @@ end
 
 contains(list, size, element)
     idx -> find(list, size, element)
-    if idx == -1
+    if idx = -1
         _return -> 0
     else
         _return -> 1
@@ -34,7 +34,7 @@ count(list, size, element)
     total -> 0
     limit -> size - 1
     for i -> 0 to limit
-        if list[i] == element
+        if list[i] = element
             total -> total + 1
         end
     end
