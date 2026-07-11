@@ -5,7 +5,7 @@ divide(a, b)
   _return -> Result.ok(a : b)
 end
 main()
-  _get("std/extdata/Result.sol")
+  _get("solstd/std/extdata/Result.sol")
   // Usage:
   res -> divide(10, 0)
   res.status = 0 ? _out -> "Error: " + res.error
