@@ -25,34 +25,77 @@ class SolInterpreter:
             self.thread_local.stack = [self.variables]
         return self.thread_local.stack
 
-    def _import_file(self, filename):
-        if not os.path.exists(filename):
-            print(f"Error: Module '{filename}' not found.")
-            return
+    def _has_guard(self, line):
+        in_quote = False
+        quote_char = None
+        for char in line:
+            if char in ['"', "'"]:
+                if not in_quote:
+                    in_quote = True
+                    quote_char = char
+                elif char == quote_char:
+                    in_quote = False
+                    quote_char = None
+            elif not in_quote and char == '?':
+                return True
+        return False
 
-        with open(filename, "r") as f:
-            code = f.read()
-            module_name = os.path.splitext(os.path.basename(filename))[0]
+    def _split_on_op(self, string, op):
+        in_quote = False
+        quote_char = None
+        for i, char in enumerate(string):
+            if char in ['"', "'"]:
+                if not in_quote:
+                    in_quote = True
+                    quote_char = char
+                elif char == quote_char:
+                    in_quote = False
+                    quote_char = None
+            elif not in_quote and char == op:
+                return string[:i], string[i+1:]
+        return None, None
 
-            lines = []
-            for l in code.split('\n'):
-                l = l.strip()
-                if not l: continue
-                if ';' in l:
-                    l = l.split(';', 1)[0].strip()
-                if l:
-                    lines.append(l)
+    def _split_outside_quotes(self, string, op):
+        parts = []
+        current = []
+        in_quote = False
+        quote_char = None
+        for char in string:
+            if char in ['"', "'"]:
+                if not in_quote:
+                    in_quote = True
+                    quote_char = char
+                elif char == quote_char:
+                    in_quote = False
+                    quote_char = None
+                current.append(char)
+            elif not in_quote and char == op:
+                parts.append("".join(current))
+                current = []
+            else:
+                current.append(char)
+        parts.append("".join(current))
+        return parts
 
-            for pc, line in enumerate(lines):
-                if "(" in line and ")" in line and "main" not in line and "end" not in line and "->" not in line and ">>" not in line and "?" not in line and not line.startswith(("if ", "while ", "for ", "elseif", "else")):
-                    parts = line.split("(")
-                    name = parts[0].strip()
-                    params_str = parts[1].replace(")", "").strip()
-                    params = [p.strip() for p in params_str.split(",")] if params_str else []
-                    self.functions[f"{module_name}.{name}"] = {"start_pc": pc + 1, "params": params, "source_lines": lines}
+    def _find_last_op(self, string, op):
+        in_quote = False
+        quote_char = None
+        last_idx = -1
+        for i, char in enumerate(string):
+            if char in ['"', "'"]:
+                if not in_quote:
+                    in_quote = True
+                    quote_char = char
+                elif char == quote_char:
+                    in_quote = False
+                    quote_char = None
+            elif not in_quote and char == op:
+                last_idx = i
+        return last_idx
 
     def _compute(self, expr):
         expr = str(expr).strip()
+        # Handle parentheses
         idx = 0
         while True:
             end_idx = expr.find(')', idx)
@@ -61,68 +104,69 @@ class SolInterpreter:
             start_idx = expr.rfind('(', 0, end_idx)
             if start_idx == -1:
                 break
-            
-            # If there's a letter, number, or underscore right before the '(',
-            # it's a function call (like my_func() or _fetch()), so skip it here!
             if start_idx > 0 and (expr[start_idx - 1].isalnum() or expr[start_idx - 1] == '_'):
                 idx = end_idx + 1
                 continue
-            
-            # Extract and evaluate the pure math inside the brackets
             inner_expr = expr[start_idx + 1:end_idx]
             inner_result = self._compute(inner_expr)
-            
-            # Stitch the evaluated number back into the main formula string
             expr = expr[:start_idx] + str(inner_result) + expr[end_idx + 1:]
-            idx = 0 # Reset to scan the newly formed string from the beginning
-        def split_outside_quotes(string, op):
-            parts = []
-            current = []
-            in_quote = False
-            quote_char = None
-            for char in string:
-                if char in ['"', "'"]:
-                    if not in_quote:
-                        in_quote = True
-                        quote_char = char
-                    elif char == quote_char:
-                        in_quote = False
-                        quote_char = None
-                    current.append(char)
-                elif not in_quote and char == op:
-                    parts.append("".join(current))
-                    current = []
-                else:
-                    current.append(char)
-            parts.append("".join(current))
-            return parts
-
-        plus_parts = split_outside_quotes(expr, '+')
+            idx = 0
+        # String concatenation with +
+        plus_parts = self._split_outside_quotes(expr, '+')
         if len(plus_parts) > 1:
-            if any(any(c.isalpha() or c in ['"', "'"] for c in p) for p in plus_parts):
+            is_string_concat = False
+            for p in plus_parts:
+                p = p.strip()
+                if (p.startswith('"') and p.endswith('"')) or (p.startswith("'") and p.endswith("'")):
+                    is_string_concat = True
+                    break
+            if is_string_concat:
                 result = ""
                 for p in plus_parts:
                     val = self._resolve(p.strip())
                     result += str(val) if val is not None else ""
                 return result
-
-        ops = ['+', '-', '*', ':']
-        for op in ops:
-            op_parts = split_outside_quotes(expr, op)
-            if len(op_parts) > 1:
-                try:
-                    left = op_parts[0]
-                    right = op.join(op_parts[1:])
-                    r1 = self._resolve(left.strip())
-                    r2 = self._resolve(right.strip())
-                    if r1 is None or r2 is None: continue
-                    val1 = float(r1)
-                    val2 = float(r2)
-                    if op == '+': return val1 + val2
-                    if op == '-': return val1 - val2
-                    if op == '*': return val1 * val2
-                    if op == ':': return val1 / val2
-                except (ValueError, TypeError): continue
+        # Equality comparison (=)
+        left, right = self._split_on_op(expr, '=')
+        if left is not None:
+            r1 = self._resolve(left.strip())
+            r2 = self._resolve(right.strip())
+            if r1 is not None and r2 is not None:
+                return 1 if r1 == r2 else 0
+        # + and -
+        for op in ['+', '-']:
+            idx = self._find_last_op(expr, op)
+            if idx != -1:
+                left = expr[:idx].strip()
+                right = expr[idx+1:].strip()
+                r1 = self._resolve(left)
+                r2 = self._resolve(right)
+                if r1 is None or r2 is None:
+                    continue
+                val1 = float(r1)
+                val2 = float(r2)
+                if op == '+': return val1 + val2
+                if op == '-': return val1 - val2
+        # * and :
+        last_idx = -1
+        last_op = None
+        for op in ['*', ':']:
+            idx = self._find_last_op(expr, op)
+            if idx > last_idx:
+                last_idx = idx
+                last_op = op
+        if last_idx != -1:
+            left = expr[:last_idx].strip()
+            right = expr[last_idx+1:].strip()
+            r1 = self._resolve(left)
+            r2 = self._resolve(right)
+            if r1 is None or r2 is None:
+                pass
+            else:
+                val1 = float(r1)
+                val2 = float(r2)
+                if last_op == '*': return val1 * val2
+                if last_op == ':': return val1 / val2
         return self._resolve(expr)
 
     def _lookup(self, name):
@@ -140,6 +184,14 @@ class SolInterpreter:
         if val.startswith("_fetch(") and val.endswith(")"):
             url_expr = val[7:-1].strip()
             return self._native_fetch(str(self._compute(url_expr)))
+        if val.endswith("{}") and "{" not in val[:-2]:
+            struct_name = val[:-2].strip()
+            blueprint = self.struct_blueprints.get(struct_name)
+            if blueprint is not None:
+                return blueprint.copy()
+            obj = self._lookup(struct_name)
+            if isinstance(obj, dict):
+                return obj.copy()
         if "(" in val and val.endswith(")") and not val.startswith("_"):
             parts = val.split("(", 1)
             name = parts[0].strip()
@@ -147,38 +199,37 @@ class SolInterpreter:
                 args_str = parts[1][:-1].strip()
                 args = [self._compute(a.strip()) for a in args_str.split(",")] if args_str else []
                 return self._call_function(name, args)
+            for func_name in self.functions:
+                if func_name.endswith("." + name):
+                    args_str = parts[1][:-1].strip()
+                    args = [self._compute(a.strip()) for a in args_str.split(",")] if args_str else []
+                    return self._call_function(func_name, args)
         if "[" in val and "]" in val:
             try:
-                name, idx_part = val.split("[")
+                name, idx_part = val.split("[", 1)
                 idx = int(idx_part.replace("]", "").strip())
                 container = self._lookup(name)
                 if isinstance(container, list): return container[idx]
             except (ValueError, IndexError, KeyError): pass
         if "." in val:
-            obj_name, prop = val.split(".", 1)
-            obj = self._lookup(obj_name)
-            if isinstance(obj, dict): return obj.get(prop, 0)
-
+            parts = val.split(".")
+            obj = self._lookup(parts[0])
+            for part in parts[1:]:
+                if isinstance(obj, dict):
+                    obj = obj.get(part, 0)
+                else:
+                    return 0
+            return obj
         for scope in reversed(self.scope_stack):
             if val in scope: return scope[val]
-
-        # FIX: Only try to parse as number if it looks like one
+        if val in self.functions:
+            return ("func_ref", val)
+        for func_name in self.functions:
+            if func_name.endswith("." + val):
+                return ("func_ref", func_name)
         if val.replace('.', '', 1).isdigit() or (val.startswith('-') and val[1:].replace('.', '', 1).isdigit()):
             return float(val) if '.' in val else int(val)
-        
         return None 
-
-    def _async_worker(self, expr, action):
-        result = self._compute(expr)
-        if action == "_out": print(f"[ASYNC OUTPUT] {result}")
-
-    def _async_input_worker(self, prompt, var_name):
-        user_val = input(prompt)
-        try:
-            if '.' in user_val: user_val = float(user_val)
-            else: user_val = int(user_val)
-        except ValueError: pass
-        self._assign(var_name, user_val)
 
     def _native_fetch(self, url):
         try:
@@ -206,17 +257,14 @@ class SolInterpreter:
         self.threads.append(t)
 
     def _evaluate_condition(self, cond):
-        if "==" in cond:
-            left, right = cond.split("==", 1)
-            return self._compute(left.strip()) == self._compute(right.strip())
-        if "=" in cond:
-            left, right = cond.split("=")
-            return self._compute(left.strip()) == self._compute(right.strip())
-        elif "<" in cond:
-            left, right = cond.split("<")
+        left, right = self._split_on_op(cond, "=")
+        if left is not None:
+            return self._compute(cond)
+        left, right = self._split_on_op(cond, "<")
+        if left is not None:
             return self._compute(left.strip()) < self._compute(right.strip())
-        elif ">" in cond:
-            left, right = cond.split(">")
+        left, right = self._split_on_op(cond, ">")
+        if left is not None:
             return self._compute(left.strip()) > self._compute(right.strip())
         return False
 
@@ -232,17 +280,78 @@ class SolInterpreter:
             pc += 1
         return pc
 
+    def _import_file(self, filename):
+        if not os.path.exists(filename):
+            print(f"Error: Module '{filename}' not found.")
+            return
+        with open(filename, "r") as f:
+            code = f.read()
+            module_name = os.path.splitext(os.path.basename(filename))[0]
+            lines = []
+            for l in code.split('\n'):
+                l = l.strip()
+                if not l: continue
+                if l.startswith(';'): continue
+                if l.startswith('//'): continue
+                if ';' in l:
+                    l = l.split(';', 1)[0].strip()
+                if l:
+                    lines.append(l)
+            # Parse structs first
+            for pc, line in enumerate(lines):
+                if line.endswith("{}") and "->" not in line and ">>" not in line and "?" not in line and not line.startswith("_"):
+                    struct_name = line.split("{}")[0].strip()
+                    fields = {}
+                    npc = pc + 1
+                    while npc < len(lines) and lines[npc] != "end":
+                        if "->" in lines[npc]:
+                            key, val = [x.strip() for x in lines[npc].split("->")]
+                            fields[key] = self._resolve(val)
+                        npc += 1
+                    self.struct_blueprints[struct_name] = fields
+                    self.variables[struct_name] = fields.copy()
+            # Parse functions
+            for pc, line in enumerate(lines):
+                if "(" in line and ")" in line and "main" not in line and "end" not in line and "->" not in line and ">>" not in line and "?" not in line and not line.startswith(("if ", "while ", "for ", "elseif", "else")):
+                    parts = line.split("(")
+                    name = parts[0].strip()
+                    params_str = parts[1].replace(")", "").strip()
+                    params = [p.strip() for p in params_str.split(",")] if params_str else []
+                    self.functions[f"{module_name}.{name}"] = {"start_pc": pc + 1, "params": params, "source_lines": lines}
+
     def execute(self, code):
-        self.lines = [l.strip() for l in code.split('\n') if l.strip() and ';' not in l or (';' in l and l.split(';', 1)[0].strip())]
-        self.lines = [l.split(';', 1)[0].strip() for l in self.lines]
+        raw_lines = code.split('\n')
+        self.lines = []
+        for l in raw_lines:
+            l = l.strip()
+            if not l: continue
+            if l.startswith(';'): continue
+            if l.startswith('//'): continue
+            if ';' in l:
+                l = l.split(';', 1)[0].strip()
+            if l:
+                self.lines.append(l)
         self.threads = []
         pc = 0
+        depth = 0
         while pc < len(self.lines):
             line = self.lines[pc]
-            if "(" in line and ")" in line and "main" not in line and "end" not in line and "->" not in line and ">>" not in line and "?" not in line and not line.startswith(("if ", "while ", "for ", "elseif", "else")):
+            if line == "end":
+                depth -= 1
+                pc += 1
+                continue
+            if depth == 0 and "(" in line and ")" in line and "main" not in line and "end" not in line and "->" not in line and ">>" not in line and "?" not in line and not line.startswith(("if ", "while ", "for ", "elseif", "else")):
                 parts = line.split("(")
-                self.functions[parts[0].strip()] = {"start_pc": pc + 1, "params": [p.strip() for p in parts[1].replace(")", "").split(",")] if parts[1].replace(")", "").strip() else []}
-            elif "{" in line: pc = self._parse_struct(pc)
+                func_name = parts[0].strip()
+                if not func_name.startswith("_"):
+                    self.functions[func_name] = {"start_pc": pc + 1, "params": [p.strip() for p in parts[1].replace(")", "").split(",")] if parts[1].replace(")", "").strip() else []}
+                    depth += 1
+            elif depth == 0 and line.endswith("{}") and "->" not in line and ">>" not in line and "?" not in line and not line.startswith("_"):
+                pc = self._parse_struct(pc)
+                pc += 1
+                continue
+            elif depth > 0 and line.startswith(("if ", "while ", "for ")):
+                depth += 1
             pc += 1
         for i, line in enumerate(self.lines):
             if line == "main()":
@@ -262,7 +371,7 @@ class SolInterpreter:
                 fields[key] = self._resolve(val)
             pc += 1
         self.struct_blueprints[struct_name] = fields
-        self._assign(struct_name, fields.copy())
+        self.variables[struct_name] = fields.copy()
         return pc
 
     def _call_function(self, name, args):
@@ -275,7 +384,9 @@ class SolInterpreter:
         return self._run_with_scope(self.functions[name]["start_pc"], self.functions[name]["params"], args)
 
     def _run_with_scope(self, start_pc, params, args):
-        local_scope = {p: a for p, a in zip(params, args)}
+        local_scope = {}
+        for p, a in zip(params, args):
+            local_scope[p] = a
         self.scope_stack.append(local_scope)
         try: self._run_block(start_pc)
         except ReturnSignal as sig: return sig.value
@@ -283,55 +394,111 @@ class SolInterpreter:
         return 0
 
     def _execute_line(self, line):
-        if "_get(" in line:
+        if line.startswith("_get("):
             filename = line.split('"')[1]
             self._import_file(filename)
             return
-        if ">>" in line and "_input" in line:
+        if line.startswith("_call("):
+            inner = line[6:-1].strip()
+            parts = [p.strip() for p in inner.split(",")]
+            func_name = self._resolve(parts[0])
+            if isinstance(func_name, tuple) and func_name[0] == "func_ref":
+                func_name = func_name[1]
+            args = [self._compute(p) for p in parts[1:]]
+            return self._call_function(func_name, args)
+        if ">>" in line and "_in" in line:
             parts = [p.strip() for p in line.split(">>")]
-            t = threading.Thread(target=self._async_input_worker, args=(str(self._compute(parts[0])), parts[2]))
-            t.start(); self.threads.append(t); return
-        is_async_func = ">>" in line and "_async" in line and "(" in line and not line.startswith("_")
-        if is_async_func: line = line.split(">>")[0].strip()
-        if line.startswith("_return ->"): raise ReturnSignal(self._compute(line.split("->", 1)[1]))
-        elif ">>" in line and "_async" in line:
-            parts = line.split(">>")
-            t = threading.Thread(target=self._async_worker, args=(parts[0].strip(), parts[2].strip()))
-            t.start(); self.threads.append(t)
-        elif line.startswith("_in"):
-            prompt = line.split('(')[1].split(')')[0].replace('"', '').replace("'", "") if "(" in line else f"Input {line.split('->')[1].strip()}: "
-            sys.stdout.write(prompt + " "); sys.stdout.flush()
-            val = sys.stdin.readline().strip()
-            try: self._assign(line.split("->")[1].strip(), float(val) if '.' in val else int(val))
-            except: self._assign(line.split("->")[1].strip(), val)
-        elif "_add(" in line:
+            if len(parts) >= 3 and parts[1] == "_in":
+                prompt = str(self._compute(parts[0]))
+                var_name = parts[2]
+                sys.stdout.write(prompt + " "); sys.stdout.flush()
+                val = sys.stdin.readline().strip()
+                try: self._assign(var_name, float(val) if '.' in val else int(val))
+                except: self._assign(var_name, val)
+                return
+        is_async = False
+        if ">>" in line:
+            parts = [p.strip() for p in line.split(">>")]
+            if parts[-1] == "_async":
+                line = ">>".join(line.split(">>")[:-1]).strip()
+                is_async = True
+        if line.startswith("_return ->"):
+            raise ReturnSignal(self._compute(line.split("->", 1)[1]))
+        if ">>" in line and "_out" in line:
+            parts = [p.strip() for p in line.split(">>")]
+            if len(parts) == 2 and parts[1] == "_out":
+                val = self._compute(parts[0])
+                if is_async:
+                    t = threading.Thread(target=lambda v=val: print(v if v is not None else ""))
+                    t.start(); self.threads.append(t)
+                else:
+                    print(val if val is not None else "")
+                return
+        if line.startswith("_out"):
+            val = self._compute(line.split("->", 1)[1].strip())
+            if is_async:
+                t = threading.Thread(target=lambda v=val: print(v if v is not None else ""))
+                t.start(); self.threads.append(t)
+            else:
+                print(val if val is not None else "")
+            return
+        if line.startswith("_in"):
+            if "->" in line:
+                var_name = line.split("->", 1)[1].strip()
+                sys.stdout.write(f"Input {var_name}: "); sys.stdout.flush()
+                val = sys.stdin.readline().strip()
+                try: self._assign(var_name, float(val) if '.' in val else int(val))
+                except: self._assign(var_name, val)
+            return
+        if "_add(" in line:
             parts = [p.strip() for p in line.replace("_add(", "").replace(")", "").split(",")]
             container = self._lookup(parts[0])
             if isinstance(container, list): container.insert(int(parts[1]), self._resolve(parts[2]))
-        elif "_remove(" in line:
+            return
+        if "_remove(" in line:
             parts = [p.strip() for p in line.replace("_remove(", "").replace(")", "").split(",")]
             container = self._lookup(parts[0])
             if isinstance(container, list): container.pop(int(parts[1]))
-        elif "_listen(" in line:
+            return
+        if "_listen(" in line:
             p, h = [p.strip() for p in line.replace("_listen(", "").replace(")", "").split(",")]
             self._native_listen(self._compute(p), h)
-        elif "_out" in line:
-            val = self._compute(line.split("->")[1].strip())
-            print(val if val is not None else "Error")
-        elif "mylist<" in line: self._assign(line.split("<")[1].split(">")[0], [])
-        elif "->" in line:
-            var, val = [x.strip() for x in line.split("->")]
+            return
+        if "<" in line and ">" in line and "->" not in line and ">>" not in line and "?" not in line and not line.startswith("_"):
+            parts = line.split("<")
+            if len(parts) == 2 and ">" in parts[1]:
+                list_name = parts[1].split(">")[0].strip()
+                self._assign(list_name, [])
+                return
+        if "->" in line:
+            var, val = [x.strip() for x in line.split("->", 1)]
             if "." in var:
-                obj, prop = var.split(".", 1)
-                target = self._lookup(obj)
-                if isinstance(target, dict): target[prop] = self._compute(val)
-            else: self._assign(var, self._compute(val))
-        elif "(" in line and line.endswith(")") and not line.startswith("_"):
+                parts = var.split(".")
+                target = self._lookup(parts[0])
+                if isinstance(target, dict):
+                    for part in parts[1:-1]:
+                        if isinstance(target, dict) and part in target:
+                            target = target[part]
+                        else:
+                            target = None
+                            break
+                    if target is not None and isinstance(target, dict):
+                        target[parts[-1]] = self._compute(val)
+            else:
+                computed = self._compute(val)
+                self._assign(var, computed)
+            return
+        if "(" in line and line.endswith(")") and not line.startswith("_"):
             parts = line.split("(")
-            if is_async_func:
-                t = threading.Thread(target=self._call_function, args=(parts[0].strip(), [self._compute(a.strip()) for a in parts[1].replace(")", "").split(",")]))
+            func_name = parts[0].strip()
+            args_str = parts[1][:-1].strip()
+            args = [self._compute(a.strip()) for a in args_str.split(",")] if args_str else []
+            if is_async:
+                t = threading.Thread(target=self._call_function, args=(func_name, args))
                 t.start(); self.threads.append(t)
-            else: self._call_function(parts[0].strip(), [self._compute(a.strip()) for a in parts[1].replace(")", "").split(",")])
+            else:
+                self._call_function(func_name, args)
+            return
 
     def _run_block(self, start_pc):
         pc = start_pc
@@ -339,6 +506,19 @@ class SolInterpreter:
         while pc < len(self.lines):
             line = self.lines[pc]
             is_executing = all(level["executing"] for level in control_stack)
+            if is_executing and "(" in line and ")" in line and "main" not in line and "end" not in line and "->" not in line and ">>" not in line and "?" not in line and not line.startswith(("if ", "while ", "for ", "elseif", "else")):
+                func_candidate = line.split("(")[0].strip()
+                if func_candidate in self.functions:
+                    depth = 1
+                    npc = pc + 1
+                    while npc < len(self.lines) and depth > 0:
+                        if self.lines[npc].startswith(("if ", "while ", "for ")):
+                            depth += 1
+                        elif self.lines[npc] == "end":
+                            depth -= 1
+                        npc += 1
+                    pc = npc
+                    continue
             if line.startswith("if "):
                 control_stack.append({"type": "if", "executing": is_executing and self._evaluate_condition(line.split("if ", 1)[1].strip()), "any_branch_true": False})
                 pc += 1; continue
@@ -367,8 +547,9 @@ class SolInterpreter:
             elif line.startswith("for "):
                 parts = line.split("for ", 1)[1].split("->")
                 var_name = parts[0].strip()
-                start_v = int(self._compute(parts[1].split(" to ")[0].strip()))
-                end_v = int(self._compute(parts[1].split(" to ")[1].strip()))
+                range_parts = parts[1].split(" to ")
+                start_v = int(self._compute(range_parts[0].strip()))
+                end_v = int(self._compute(range_parts[1].strip()))
                 end_pc = self._get_block_end(pc)
                 if is_executing and start_v <= end_v:
                     self._assign(var_name, start_v)
@@ -387,7 +568,7 @@ class SolInterpreter:
                             pc = top["start_pc"] - 1
                 pc += 1; continue
             if is_executing:
-                if "?" in line:
+                if self._has_guard(line):
                     cond, action = line.split("?", 1)
                     if self._evaluate_condition(cond.strip()): self._execute_line(action.strip())
                 else: self._execute_line(line)
