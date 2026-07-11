@@ -14,7 +14,7 @@ put(map_list, current_pair_count, key, value)
     ; Look for an existing key
     i -> 0
     while i < total_slots
-        if map_list[i] == key
+        if map_list[i] = key
             val_idx -> i + 1
             _add(map_list, val_idx, value) ; Overwrites the old value!
             found -> 1
@@ -25,7 +25,7 @@ put(map_list, current_pair_count, key, value)
     end
     
     ; If it's a brand new key, append it to the end
-    if found == 0
+    if found = 0
         _add(map_list, total_slots, key)
         
         val_idx -> total_slots + 1
@@ -39,7 +39,7 @@ get(map_list, current_pair_count, key)
     
     i -> 0
     while i < total_slots
-        if map_list[i] == key
+        if map_list[i] = key
             val_idx -> i + 1
             _return -> map_list[val_idx]
         end
