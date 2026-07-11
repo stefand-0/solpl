@@ -4,7 +4,7 @@ find_user(id)
 end
 ; Optional structs have 2 parameters: value, status
 main()
-  _get("std/extdata/Maybe.sol")
+  _get("solstd/std/extdata/Maybe.sol")
   ; For example, checking for an ID.
   result -> find_user(1)
   result.status = 0 ? _out -> "User not found!"
