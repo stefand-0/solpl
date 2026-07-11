@@ -1,3 +1,4 @@
+; Make sure to clone the `solstd` repo.
 main()
   ; Always import in the main function
   ; For example, using the Math library
