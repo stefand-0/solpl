@@ -1,5 +1,5 @@
 main()
-  _get("std/bool/Boolean.sol")
+  _get("solstd/std/bool/Boolean.sol")
   n -> Boolean.true()
   boolAsString -> Boolean.to_str(n)
   ; That was a Boolean
