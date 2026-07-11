@@ -9,11 +9,11 @@ insert(tree_list, value)
     current_idx -> 0
     placed -> 0
     
-    while placed == 0
+    while placed = 0
         slot_value -> tree_list[current_idx]
         
         ; 1. Found an empty slot! Place the value here.
-        if slot_value == -1
+        if slot_value = -1
             tree_list[current_idx] -> value
             placed -> 1
         else
