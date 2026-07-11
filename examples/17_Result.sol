@@ -1,7 +1,7 @@
 ; Data types that originate from Result{} are used for error handling
 ; A function that could fail
 divide(a, b)
-  b == 0 ? _return -> Result.err("Cannot divide by zero!")
+  b = 0 ? _return -> Result.err("Cannot divide by zero!")
   _return -> Result.ok(a : b)
 end
 main()
