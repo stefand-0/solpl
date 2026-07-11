@@ -1,7 +1,7 @@
 main()
 ; There are lots of more data types in extdata
 ; We will only focus on Binary Trees now.
-  _get("std/extdata/BinaryTree.sol)
+  _get("solstd/std/extdata/BinaryTree.sol)
   ; First, initialize a normal list
   n<tree>
   ; Let's turn it into a binary tree
