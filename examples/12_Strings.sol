@@ -1,6 +1,6 @@
 main()
   ; Here, we are going to check if a string is empty.
-  _get("std/str/String.sol")
+  _get("solstd/std/str/String.sol")
   string -> ""
   isEmpty -> String.empty(string)
   isEmpty = 1 ? _out -> "Empty!"
