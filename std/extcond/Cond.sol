@@ -2,6 +2,6 @@ when(a, b, action)
   _get("std/extdata/Infinity.sol")
   j -> Infinity.new()
   for i -> 0 to j
-    a == b ? _return -> action
+    a = b ? _return -> action
   end
 end
