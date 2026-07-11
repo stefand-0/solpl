@@ -8,6 +8,6 @@ main()
   _get("std/extdata/Result.sol")
   // Usage:
   res -> divide(10, 0)
-  res.status == 0 ? _out -> "Error: " + res.error
-  res.status == 1 ? _out -> "Success: " + res.data
+  res.status = 0 ? _out -> "Error: " + res.error
+  res.status = 1 ? _out -> "Success: " + res.data
 end
