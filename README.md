@@ -15,7 +15,7 @@ I originaly needed something fast, that handled async natively, and which had ve
 
 # What advantages does Sol have over other languages?
 
-- Native async, with no external libraries
+- Native async, with no external libraries, and threading with RaySync
 
 - Native networking, also with no external libraries
 
@@ -73,9 +73,6 @@ main()
     _out -> 222
 end
 ```
-
-> [!IMPORTANT]
-> Asynchronous functions cannot use the _return method to return a value. Please use _out instead.
 
 > [!TIP]
 > Make use of the standard libraries for extra data types, such as Booleans, HashMaps etc.
