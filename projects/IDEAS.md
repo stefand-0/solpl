@@ -15,6 +15,7 @@
   > Clone SolSTD
   > 
   > Use the List and String  utilities
+  > 
   > Use non-blocking IO:
   > 
   > `"Prompt" >> _input >> variable`
