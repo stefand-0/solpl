@@ -1,7 +1,7 @@
 ; This demonstrates launching a group of threads:
 
-func(a, b)
-  _return -> a + b
+func()
+  _return -> 1
 end
 
 main()
