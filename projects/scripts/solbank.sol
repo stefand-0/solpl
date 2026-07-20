@@ -1,8 +1,8 @@
 account{}
   name = ""
-  id = ""
-  cvv = ""
-  amount = ""
+  id = 566
+  cvv = 123
+  amount = -1
 end
 
 get_amount()
