@@ -2,6 +2,11 @@
 
 <img src="./images/Add a heading.png" alt="Alt text" width="400">
 
+![Python](https://img.shields.io/badge/Python-3776AB?style=for-the-badge&logo=python&logoColor=white)
+![Apache License 2.0](https://img.shields.io/badge/License-Apache_2.0-blue.svg?style=for-the-badge&logo=apache&logoColor=white)
+![Sol](https://img.shields.io/badge/Sol-%F0%9F%8C%9E-orange?style=for-the-badge)
+
+
 - Embrace readability, ease of use, and featurefulness. 
 
 > An interpreted programming language which combines features from many modern languages like Kotlin, Lua, Go and many more. It was designed to be as concise as Lua, but still providing lots of features like templates, interfaces, data classes etc.
