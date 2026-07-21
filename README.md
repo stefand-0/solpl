@@ -1,7 +1,4 @@
-
-# Create an amazing README with animated SVG badges, feature cards, and the new syntax
-
-readme_content = """<div align="center">
+<div align="center">
 
 <!-- Animated SOL Banner -->
 <svg xmlns="http://www.w3.org/2000/svg" width="800" height="200" viewBox="0 0 800 200">
