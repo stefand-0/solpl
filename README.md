@@ -1,5 +1,7 @@
 # Sol ☀️
 
+![images/Add-a-heading.png](image)
+
 - Embrace readability, ease of use, and featurefulness. 
 
 > An interpreted programming language which combines features from many modern languages like Kotlin, Lua, Go and many more. It was designed to be as concise as Lua, but still providing lots of features like templates, interfaces, data classes etc.
