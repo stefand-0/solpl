@@ -1,6 +1,6 @@
 # Sol ☀️
 
-![LOGO](images/Add%20 a%20heading.png)
+<img src="./images/Add a heading.png" alt="Alt text" width="400">
 
 - Embrace readability, ease of use, and featurefulness. 
 
