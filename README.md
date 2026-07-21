@@ -1,6 +1,6 @@
 # Sol ☀️
 
-![images/Add-a-heading.png](image)
+![LOGO](images/Add-a-heading.png)
 
 - Embrace readability, ease of use, and featurefulness. 
 
