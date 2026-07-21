@@ -93,7 +93,7 @@ interface Drawable
 end
 
 interface Movable
-    fun move(dx: float, dy: float): void
+    fun move(dx: float, dy: float): nothing
 end
 
 // --------------------------------------------------
@@ -137,7 +137,7 @@ fun grade(score: integer): string
 end
 
 // While loop
-fun countdown(start: integer): void
+fun countdown(start: integer): nothing
     nonimm i: integer -> start
     while (i > 0)
         std.outln(i)
@@ -145,7 +145,7 @@ fun countdown(start: integer): void
     end
 end
 
-// For loop (C-style)
+// For loop (C-style)
 fun sumTo(n: integer): integer
     imm total: integer -> 0
     for (imm i: integer -> 0; i <= n; i -> i + 1)
@@ -155,7 +155,7 @@ fun sumTo(n: integer): integer
 end
 
 // For-in loop
-fun printNames(names: list): void
+fun printNames(names: list): nothing
     for (name in names)
         std.outln(name)
     end
@@ -205,7 +205,7 @@ fun parseInt(s: string): Result<integer, string>
     ret Err("Not a valid integer: " + s)
 end
 
-fun useResult(): void
+fun useResult(): nothing
     imm r: Result<integer, string> -> parseInt("42")
     if (result.isOk(r))
         std.outln("Parsed: " + type.toString(result.unwrap(r)))
@@ -263,7 +263,7 @@ imm intBool: integer -> type.boolToInt(true)
 // 16. Operators
 // --------------------------------------------------
 
-fun demonstrateOperators(): void
+fun demonstrateOperators(): nothing
     imm a: integer -> 10
     imm b: integer -> 3
     
@@ -335,7 +335,7 @@ fun findFirstEven(numbers: list): integer
     ret -1
 end
 
-fun skipOdds(numbers: list): void
+fun skipOdds(numbers: list): nothing
     for (n in numbers)
         if (n % 2 != 0)
             continue
@@ -348,7 +348,7 @@ end
 // 20. Complex Example: A Mini Program
 // --------------------------------------------------
 
-fun main(): void
+fun main(): nothing
     // Greeting
     std.outln(greet("World"))
     
