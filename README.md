@@ -29,6 +29,10 @@ pip install solpl
 solpl FILE.sol
 ```
 
+# Syntax
+
+See [example](example/all.sol) for more details!
+
 # License
 
 This project was licensed with the Apache License 2.0. See the [LICENSE](LICENSE) for more details...
