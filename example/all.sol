@@ -111,12 +111,7 @@ fun main(): nothing
     std.outln("keys: " + type.toString(map.keys(user)))
     std.outln("len: " + type.toString(map.len(user)))
     std.outln("")
-    
-    // --- Vector ---
-    std.outln("--- Vector ---")
-    imm points: vect -> <<1, 2>> <<3, 4>> <<5, 6>>
-    std.outln("vect: " + type.toString(points))
-    std.outln("")
+
     
     // --- Result ---
     std.outln("--- Result ---")
