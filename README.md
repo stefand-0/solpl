@@ -30,6 +30,12 @@ pip install solpl
 solpl FILE.sol
 ```
 
+- To enter the REPL:
+
+```bash
+solpl
+```
+
 # Syntax
 
 See [example](example/all.sol) for more details!
