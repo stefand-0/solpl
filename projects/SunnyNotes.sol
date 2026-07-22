@@ -25,7 +25,7 @@ end
 fun main(): nothing
   std.outln(" === SunnyNotes 1.0 === ")
   std.outln(" - Welcome to SunnyNotes! ")
-  std.outln(" - Type "add NAME, DESCRIPTION" to add a note! ")
+  std.outln(" - Type "add" to add a Note! ")
   std.outln(" - Type "show" to show all notes! ")
   imm input: string -> std.in("> ")
   match (input)
