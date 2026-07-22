@@ -45,6 +45,9 @@ fun main(): nothing
     std.outln("length: " + type.toString(string.length(greeting)))
     std.outln("trim: \"" + string.trim("  spaces  ") + "\"")
     std.outln("")
+
+    // --- Any ---
+    imm anyType: any -> "any"
     
     // --- Char ---
     std.outln("--- Char ---")
@@ -152,6 +155,9 @@ fun main(): nothing
     // --- Nothing ---
     std.outln("--- Nothing ---")
     imm empty: nothing -> nothing
+    imm empty2: undefined -> undefined
+    imm empty3: void -> void
+    // All output None
     std.outln("nothing: " + type.toString(empty))
     std.outln("")
     
