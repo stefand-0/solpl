@@ -14,6 +14,7 @@
 # Why use Sol?
 
 Sol is quick to install and use, and provides lots of features, and a robust standard library!
+It mixes features from multiple programming languages I like, and sets them out in an easy-to-use way...
 
 # Installing Sol?
 
