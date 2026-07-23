@@ -36,6 +36,7 @@ fun main(): nothing
   std.outln(" | Welcome to SunnyNotes! |")
   std.outln(" | Type `add` to add a Note! |")
   std.outln(" | Type `show` to show all Notes! |")
+  std.outln(" | Type `delete` to delete a Note! |")
   std.outln(" | ====================== |")
   imm input: string -> std.in("> ")
   match (input)
